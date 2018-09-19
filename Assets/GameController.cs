@@ -10,9 +10,8 @@ public class GameController : MonoBehaviour {
 	private CameraManager camManager;
     private TargetBoard targetBoard;
     private float waitTimeToRefressCounter;
-
+    private ScoreSlider scoreSlider;
     public GameObject dashObject;
-	public Text levelText;
     public Text scoreText;
     public Text dashesLeftText;
 
@@ -26,6 +25,7 @@ public class GameController : MonoBehaviour {
 	public int scoreOfThisLevel = 0;
 
 	void Start () {
+		scoreSlider = FindObjectOfType<ScoreSlider>();
         dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString();
         waitTimeToRefressCounter = waitTimeToRefresh;
 		targetBoard = GameObject.FindObjectOfType<TargetBoard>();
@@ -36,6 +36,9 @@ public class GameController : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(!dash){return;}
+		if(!dash.GetIsDashed()){return;}
+
+
 
 		float dashZPos = dash.transform.position.z;
 		float zPosToChangeView = targetBoard.transform.position.z - viewChangeDistance;
@@ -50,42 +53,37 @@ public class GameController : MonoBehaviour {
 				AddScore(targetBoard.GetScore());
 
                 UpdateSlider();
-
-                CheckLevelPassableAndUpdateHUD();
+                //CheckLevelPassableAndUpdateHUD();
 				RenewTarget();
 			}
 
 			//when dash reach the target-like distance, handle the result
 			if(dashZPos >= targetBoard.transform.position.z){
-
 				CurrentDashResultHandle (); 
 			}
-		}  
-
+		}   
+	
 	}
 
     private void UpdateSlider()
     {
         ScoreSlider scoreSlider = FindObjectOfType<ScoreSlider>();
-        scoreSlider.UpdateSlider(GetCurrentScore());
+       
         int scoreToPop = targetBoard.GetScore();
+		scoreSlider.UpdateSlider(scoreToPop);
         scoreSlider.PopTheScore(scoreToPop);
     }
 	 
 	private void CurrentDashResultHandle ()
 	{
-
-		if (numberToDashRemaining <= 0) {
+		if (!scoreSlider.GetIsFillingEffect() && numberToDashRemaining <= 0) {
 			GameOver();
-
 		} else {
 			PrepareForNextDash (); 
 		}
-
 	}
 
 	private void GameOver(){
-		print ("game over");
 		PauseMenuController pauseMenuController = FindObjectOfType<PauseMenuController> ();
 		pauseMenuController.DisplayNotifText ();
 		pauseMenuController.DisplayGameOverButtons ();
@@ -112,7 +110,8 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void SpawnNewDash(){
-		numberToDashRemaining--; 
+		numberToDashRemaining--;
+		dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString(); 
 		GameObject dashGameObject = (GameObject) Instantiate(dashObject, this.transform.position, this.transform.rotation);
 	}
 
@@ -124,40 +123,33 @@ public class GameController : MonoBehaviour {
 		targetBoard.ResetTarget();
 	}
 
-    //TODO change this function name later
-	private void CheckLevelPassableAndUpdateHUD(){
-		   
-		RuleManager ruleMng = FindObjectOfType<RuleManager>();
-		bool bCanMoveNextLevel = ruleMng.CheckLevelPassableBaseOnScore(scoreOfThisLevel);
-        int currentLevel = ruleMng.GetCurrentLevel();
-        levelText.text = "Level " + (currentLevel + 1).ToString();
-        if (bCanMoveNextLevel){
 
-			//increase dash stock based on level
-			if(currentLevel > 7){
-				numberToDashRemaining += 4;
-			}else if (currentLevel > 4) {
-				numberToDashRemaining += 3;
-			}else{
-				numberToDashRemaining += 2;
-			}
-		}
 
-	}
+    private void UpdateScoreText()
+    {
+        scoreText.text = scoreOfThisLevel.ToString();
+    }
 
 	public void AddScore(int scoreToAdd){
 		scoreOfThisLevel += scoreToAdd;
         UpdateScoreText();
-
     }
 
 	public int GetCurrentScore(){
 		return scoreOfThisLevel;
 	}
 
-    private void UpdateScoreText()
-    {
-       // string displayScore = 
-        scoreText.text = scoreOfThisLevel.ToString();
-    }
+	public void RewardDashOnLevelUp(int level){
+		   
+		//RuleManager ruleMng = FindObjectOfType<RuleManager>();
+		//bool bCanMoveNextLevel = ruleMng.CheckLevelPassableBaseOnScore(scoreOfThisLevel);
+		//increase dash stock based on level
+		if(level > 7){
+			numberToDashRemaining += 4;
+		}else if (level > 4) {
+			numberToDashRemaining += 3;
+		}else{
+			numberToDashRemaining += 2;
+		}
+	}
 } 

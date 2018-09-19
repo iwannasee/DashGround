@@ -50,7 +50,6 @@ public class CameraManager : MonoBehaviour {
 		mainCamera.transform.SetParent(attachedFollowDashCamPosition.parent);
 		//set key to run actual smooth view changing
 		isDashed = true;
-		Debug.Log("attaching view");
 	}
 
 	public void ResetCameraPosition(){

@@ -29,7 +29,7 @@ public class RuleManager : MonoBehaviour {
 
 	public bool CheckLevelPassableBaseOnScore(int score){
 		if(score >= requireScoreToPassLevel[currentLevel]){
-			currentLevel++;
+			//currentLevel++;
 			return true; //Now can move to next level
 		}else{
 			return false;

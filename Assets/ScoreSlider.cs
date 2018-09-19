@@ -7,39 +7,65 @@ public class ScoreSlider : MonoBehaviour {
 
     private GameController gameController;
     private RuleManager ruleMng;
-    private Slider slider;
-    private int currentLevelRequireScore;
-    private int currentScore;
- 
+    private Slider slider;	
+	private bool bCanUpdate = true;
+	private int scoreObtained;
+	private int currentLevel; 
+
     //Implement on Inspector
     public Image fillImage;
+    public Text levelText;
     public Animator poppingScoreAnimator;
+	public float fillingEffectDuration = 1f;
+
+
 
     // Use this for initialization
     void Start () {
+		levelText.text =  "Level " + (currentLevel + 1).ToString();
+
         gameController = FindObjectOfType<GameController>();
         ruleMng = FindObjectOfType<RuleManager>();
         slider = GetComponent<Slider>();
     }
-    
-    public void UpdateSlider( int currentScore)
-    {
-        
-        currentLevelRequireScore = ruleMng.GetRequireScoreOfLevel(ruleMng.GetCurrentLevel());
-        float valueToPutInSlider = (float)currentScore / (float) currentLevelRequireScore;
-        if (valueToPutInSlider >= 1)
-        {
-            slider.value = valueToPutInSlider - 1;
-        }
-        else
-        {
-            slider.value = valueToPutInSlider;
-        }
 
-        fillImage.color = new Color(fillImage.color.r,
-                                    fillImage.color.g,
-                                    slider.value,
-                                    fillImage.color.a);
+    void Update(){
+
+		if(bCanUpdate){
+			fillingEffectDuration-= Time.deltaTime;
+
+			int currentLevelRequireScore = ruleMng.GetRequireScoreOfLevel(currentLevel);
+
+			float valueToPutInSlider = (float)scoreObtained / (float) currentLevelRequireScore;
+
+			slider.value += Time.deltaTime*valueToPutInSlider;
+			if(slider.value >= 1f){
+
+				slider.value = 0f;
+				print("slider value over 1, reset to " + slider.value);
+				currentLevel++;
+				gameController.RewardDashOnLevelUp(currentLevel);
+				levelText.text =  "Level " + (currentLevel + 1).ToString();
+			}
+
+			fillImage.color = new Color(fillImage.color.r, 
+	                                    fillImage.color.g,
+	                                    slider.value,
+	                                    fillImage.color.a);
+
+			if(fillingEffectDuration<= 0f){
+				fillingEffectDuration = 1;
+				bCanUpdate = false;
+
+				print(scoreObtained + " " + currentLevelRequireScore);
+			}
+	      }
+    } 
+     
+    public void UpdateSlider( int ScoreToUpdate) 
+    { 
+		scoreObtained = ScoreToUpdate;
+		bCanUpdate = true;
     }
 
     public void PopTheScore(int scoreToPop)
@@ -48,5 +74,9 @@ public class ScoreSlider : MonoBehaviour {
         scoreText.text = "+" + scoreToPop.ToString();
         poppingScoreAnimator.SetTrigger("popScoreTrigger");
 
+    }
+
+    public bool GetIsFillingEffect(){
+    	return bCanUpdate;
     }
 }
