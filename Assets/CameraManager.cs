@@ -7,6 +7,7 @@ public class CameraManager : MonoBehaviour {
 	public float timeWaitToAttachView;
 	private Camera mainCamera;
 	public Camera targetCamera;
+    public float camThreshold; //TODO change name later
 	private Transform attachedFollowDashCamPosition;
 
 	private bool isDashed = false;
@@ -26,9 +27,10 @@ public class CameraManager : MonoBehaviour {
 
 		//Actual Smooth change view process
 		if(isDashed){
+            print("isDash");
 			mainCamera.transform.localPosition = Vector3.Lerp(mainCamera.transform.localPosition, 
 															attachedFollowDashCamPosition.localPosition, 0.1f);
-			if(mainCamera.transform.localPosition == attachedFollowDashCamPosition.localPosition){
+			if(Mathf.Abs(mainCamera.transform.localPosition.z - attachedFollowDashCamPosition.localPosition.z)< camThreshold){
 				isDashed = false;
 			}
 		}

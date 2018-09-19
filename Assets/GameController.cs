@@ -35,8 +35,10 @@ public class GameController : MonoBehaviour {
 	 
 	// Update is called once per frame
 	void Update () {
-		if(!dash){return;}
-		if(!dash.GetIsDashed()){return;}
+		if(!dash){
+            return;}
+		if(!dash.GetIsDashed()){
+             return;}
 
 
 
@@ -56,11 +58,16 @@ public class GameController : MonoBehaviour {
                 //CheckLevelPassableAndUpdateHUD();
 				RenewTarget();
 			}
-
-			//when dash reach the target-like distance, handle the result
-			if(dashZPos >= targetBoard.transform.position.z){
-				CurrentDashResultHandle (); 
-			}
+            //print("ISDash not available");
+            //when dash reach the target-like distance, handle the result
+            if (dashZPos >= targetBoard.transform.position.z){
+               
+                CurrentDashResultHandle ();
+            }
+            else
+            {
+                print("12121sasddsadasdd");
+            }
 		}   
 	
 	}
@@ -76,7 +83,8 @@ public class GameController : MonoBehaviour {
 	 
 	private void CurrentDashResultHandle ()
 	{
-		if (!scoreSlider.GetIsFillingEffect() && numberToDashRemaining <= 0) {
+        
+        if (!scoreSlider.GetIsFillingEffect() && numberToDashRemaining <= 0) {
 			GameOver();
 		} else {
 			PrepareForNextDash (); 
@@ -90,8 +98,8 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void PrepareForNextDash(){
-
-		waitTimeToRefressCounter -= Time.deltaTime;
+        
+        waitTimeToRefressCounter -= Time.deltaTime;
 		if(waitTimeToRefressCounter <= 0){
 			camManager.ChangeToMainCamera();
 
@@ -122,8 +130,6 @@ public class GameController : MonoBehaviour {
 	private void RenewTarget(){
 		targetBoard.ResetTarget();
 	}
-
-
 
     private void UpdateScoreText()
     {
