@@ -6,7 +6,8 @@ public class CameraManager : MonoBehaviour {
 
 	public float timeWaitToAttachView;
 	private Camera mainCamera;
-	public Camera targetCamera;
+    private Camera targetCamera;
+
     public float camThreshold; //TODO change name later
 	private Transform attachedFollowDashCamPosition;
 
@@ -14,8 +15,9 @@ public class CameraManager : MonoBehaviour {
 	private Vector3 camStartPosition;
 	// Use this for initialization
 	void Start () {
-		mainCamera = Camera.main;
-		ChangeToMainCamera();
+        ReGetCameras();
+
+        ChangeToMainCamera();
 
 		camStartPosition = mainCamera.transform.position;
 		if(!mainCamera){
@@ -27,7 +29,6 @@ public class CameraManager : MonoBehaviour {
 
 		//Actual Smooth change view process
 		if(isDashed){
-            print("isDash");
 			mainCamera.transform.localPosition = Vector3.Lerp(mainCamera.transform.localPosition, 
 															attachedFollowDashCamPosition.localPosition, 0.1f);
 			if(Mathf.Abs(mainCamera.transform.localPosition.z - attachedFollowDashCamPosition.localPosition.z)< camThreshold){
@@ -59,14 +60,26 @@ public class CameraManager : MonoBehaviour {
 	}
 
 	public void ChangeToTargetCamera(){
-		mainCamera.enabled = false;
+        targetCamera = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
+
+        mainCamera.enabled = false;
 		targetCamera.enabled = true;
+
 	}
 
 	public void ChangeToMainCamera(){
-		mainCamera.enabled = true;
+        targetCamera = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
+
+        mainCamera.enabled = true;
 		targetCamera.enabled = false;
-	}
+    }
+
+    public void ReGetCameras()
+    {
+        mainCamera = Camera.main;
+        targetCamera = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
+
+    }
 
 }
 

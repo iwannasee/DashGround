@@ -19,9 +19,10 @@ public class GameController : MonoBehaviour {
 	public float waitTimeToRefresh = 1f;
 	[Tooltip("How long to wait until the next dashing turn")]
 	public float viewChangeDistance = 20f;
+    public float targetDashDistance;
 
-	/*Rules for game. Move to level manager later*/
-	public int numberToDashRemaining = 2;
+    /*Rules for game. Move to level manager later*/
+    public int numberToDashRemaining = 2;
 	public int scoreOfThisLevel = 0;
 
 	void Start () {
@@ -35,14 +36,17 @@ public class GameController : MonoBehaviour {
 	 
 	// Update is called once per frame
 	void Update () {
+        if(Input.GetKey(KeyCode.A)){
+            camManager.ChangeToMainCamera();
+        }
 		if(!dash){
             return;}
 		if(!dash.GetIsDashed()){
              return;}
 
+        //camManager.ReGetCameras();
 
-
-		float dashZPos = dash.transform.position.z;
+        float dashZPos = dash.transform.position.z;
 		float zPosToChangeView = targetBoard.transform.position.z - viewChangeDistance;
 
 
@@ -61,12 +65,9 @@ public class GameController : MonoBehaviour {
             //print("ISDash not available");
             //when dash reach the target-like distance, handle the result
             if (dashZPos >= targetBoard.transform.position.z){
-               
-                CurrentDashResultHandle ();
-            }
-            else
-            {
-                print("12121sasddsadasdd");
+                PrepareForNextDash();
+
+               // CurrentDashResultHandle ();
             }
 		}   
 	
@@ -81,46 +82,49 @@ public class GameController : MonoBehaviour {
         scoreSlider.PopTheScore(scoreToPop);
     }
 	 
-	private void CurrentDashResultHandle ()
-	{
-        
-        if (!scoreSlider.GetIsFillingEffect() && numberToDashRemaining <= 0) {
-			GameOver();
-		} else {
-			PrepareForNextDash (); 
-		}
+
+	private void GameOver()
+    {
+        PauseMenuController pauseMenuController = FindObjectOfType<PauseMenuController>();
+        pauseMenuController.DisplayNotifText();
+        pauseMenuController.DisplayGameOverButtons();
 	}
 
-	private void GameOver(){
-		PauseMenuController pauseMenuController = FindObjectOfType<PauseMenuController> ();
-		pauseMenuController.DisplayNotifText ();
-		pauseMenuController.DisplayGameOverButtons ();
-	}
 
+    //wait for  some seconds while calculating result, then prepare setting for the next dash
 	private void PrepareForNextDash(){
-        
+        //set clock
         waitTimeToRefressCounter -= Time.deltaTime;
-		if(waitTimeToRefressCounter <= 0){
-			camManager.ChangeToMainCamera();
 
-			//Detach main camera from dash
+		if(waitTimeToRefressCounter <= 0){
+            //Check for gameover
+            if(numberToDashRemaining <=0)
+            {
+                GameOver();
+                return;
+            }
+
+			camManager.ChangeToMainCamera();
+            print("refreshing");
+            //Detach main camera from dash
 			Camera.main.transform.SetParent(null);
 			camManager.ResetCameraPosition();
 			dash.DestroyDashGameObject();
+            SpawnNewDash();
+            CheckLevelUpToReNewTarget();
 
-			//renew IsHitTarget to false
-			RenewTarget();
-			SpawnNewDash();
-			ReFindDashObject(); 
-
-			waitTimeToRefressCounter = waitTimeToRefresh;	 
+            ReFindDashObject();
+  
+            waitTimeToRefressCounter = waitTimeToRefresh;	 
 		}
+
 	}
 
 	private void SpawnNewDash(){
 		numberToDashRemaining--;
 		dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString(); 
 		GameObject dashGameObject = (GameObject) Instantiate(dashObject, this.transform.position, this.transform.rotation);
+        
 	}
 
 	private void ReFindDashObject(){
@@ -130,6 +134,25 @@ public class GameController : MonoBehaviour {
 	private void RenewTarget(){
 		targetBoard.ResetTarget();
 	}
+
+    private void CheckLevelUpToReNewTarget()
+    {
+        RuleManager ruleMng = FindObjectOfType<RuleManager>();
+        if (scoreSlider.GetCanRenewTarget())
+        {
+            print("now spawn new target");
+            targetBoard.DestroyTarget();
+            
+            FindObjectOfType<TargetSpawner>().SpawnNewTargetWithGivenLevel(scoreSlider.GetCurrentLevel());
+            targetBoard = GameObject.FindObjectOfType<TargetBoard>();
+            Camera cam = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
+            cam.enabled = false;
+            camManager.ChangeToMainCamera();
+
+            scoreSlider.DisableRenewTarget();
+
+        }
+    }
 
     private void UpdateScoreText()
     {

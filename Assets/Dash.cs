@@ -44,7 +44,6 @@ public class Dash : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision collision){
-        print("colliding");
 		rigidBody.isKinematic = true;
 	}
 

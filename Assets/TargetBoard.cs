@@ -51,4 +51,9 @@ public class TargetBoard : MonoBehaviour {
 	public void ResetTarget(){
 		bTargetIsHit = false;
 	}
+
+    public void DestroyTarget()
+    {
+        Destroy(this.transform.parent.gameObject);
+    }
 }

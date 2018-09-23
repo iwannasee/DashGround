@@ -124,6 +124,7 @@
     <Compile Include="Assets\RuleManager.cs" />
     <Compile Include="Assets\ScoreSlider.cs" />
     <Compile Include="Assets\TargetBoard.cs" />
+    <Compile Include="Assets\TargetSpawner.cs" />
     <None Include="Assets\_RBIC\Fonts\sweet_hipster\License Request.txt" />
     <None Include="Assets\_RBIC\Fonts\enchanted_land\readme.txt" />
     <Reference Include="UnityEditor.StandardEvents">

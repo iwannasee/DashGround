@@ -16,7 +16,7 @@ public class RuleManager : MonoBehaviour {
 		50000		// more to pass level 10 
 	};
 
-	private int currentLevel = 0;
+	private int currentLevel = 0; //TODO remove this to avoid ambiguality
 	public bool bIsRescueMode = false; // TODO Make private later
 	public bool bIsAimGameMode = true; // TODO Make private later
 
@@ -27,8 +27,9 @@ public class RuleManager : MonoBehaviour {
 		gameController = FindObjectOfType<GameController>();
 	}
 
-	public bool CheckLevelPassableBaseOnScore(int score){
-		if(score >= requireScoreToPassLevel[currentLevel]){
+	public bool CheckLevelPassableBaseOnScore(int score, int level){
+ 
+		if(score >= requireScoreToPassLevel[level]){
 			//currentLevel++;
 			return true; //Now can move to next level
 		}else{
@@ -36,7 +37,7 @@ public class RuleManager : MonoBehaviour {
 		}
 
 	}
-
+    
 	public int GetCurrentLevel(){
 		return currentLevel;
 	}
