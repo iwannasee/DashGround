@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CameraManager : MonoBehaviour {
-
+    public GameObject dashEffectPref;
 	public float timeWaitToAttachView;
 	private Camera mainCamera;
     private Camera targetCamera;
@@ -51,8 +51,12 @@ public class CameraManager : MonoBehaviour {
 		attachedFollowDashCamPosition = followCamPoint.transform;
 
 		mainCamera.transform.SetParent(attachedFollowDashCamPosition.parent);
-		//set key to run actual smooth view changing
-		isDashed = true;
+        mainCamera.transform.GetChild(0).gameObject.SetActive(true);
+        /*GameObject dashEffect = Instantiate(dashEffectPref) as GameObject;
+        dashEffect.transform.SetParent(mainCamera.transform);
+        dashEffect.transform.localPosition = new Vector3(0, 0, 0);*/
+        //set key to run actual smooth view changing
+        isDashed = true;
 	}
 
 	public void ResetCameraPosition(){
@@ -61,7 +65,7 @@ public class CameraManager : MonoBehaviour {
 
 	public void ChangeToTargetCamera(){
         targetCamera = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
-
+        mainCamera.transform.GetChild(0).gameObject.SetActive(false);
         mainCamera.enabled = false;
 		targetCamera.enabled = true;
 

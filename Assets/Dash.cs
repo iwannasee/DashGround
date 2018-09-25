@@ -23,8 +23,9 @@ public class Dash : MonoBehaviour {
 
 		if(bCanInput){
 			if(Input.GetKey(KeyCode.Space)){
-				Launch();
-			} 
+                rigidBody.isKinematic = false;
+                Launch();
+            } 
 			//Navigate the directions
 			if(Input.GetKey(KeyCode.LeftArrow)){
 				PushForce(pushingForce, -transform.right);

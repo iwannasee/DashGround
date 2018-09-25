@@ -9,17 +9,19 @@ public class TargetSpawner : MonoBehaviour {
     public float maxXRange;
     public float maxYrange;
     public float zRange;
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    public void SpawnNewTargetOnTrunkWithLevel(int level)
+    {
+        GameObject[] trunks = GameObject.FindGameObjectsWithTag("Trunk");
+        foreach (GameObject trunk in trunks)
+        {
 
 
+        }
+
+    }
+
+    //Spawn Targets only without base/trunk
     public void SpawnNewTargetWithGivenLevel(int level)
     {
         Vector3 newPosForNewTarget;
