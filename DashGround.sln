@@ -1,9 +1,7 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashGround", "Assembly-CSharp.csproj", "{043D26E6-0A51-DE60-A00C-7CE1E1A6BBA7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DashGround", "Assembly-CSharp-firstpass.csproj", "{C46D3697-07A5-7394-37BD-F5459519265E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,12 +13,11 @@ Global
 		{043D26E6-0A51-DE60-A00C-7CE1E1A6BBA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{043D26E6-0A51-DE60-A00C-7CE1E1A6BBA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{043D26E6-0A51-DE60-A00C-7CE1E1A6BBA7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C46D3697-07A5-7394-37BD-F5459519265E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C46D3697-07A5-7394-37BD-F5459519265E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C46D3697-07A5-7394-37BD-F5459519265E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C46D3697-07A5-7394-37BD-F5459519265E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal
