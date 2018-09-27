@@ -57,6 +57,7 @@
      <Compile Include="Assets\Scripts\ScoreSlider.cs" />
      <Compile Include="Assets\Scripts\TargetBoard.cs" />
      <Compile Include="Assets\Scripts\TargetSpawner.cs" />
+     <Compile Include="Assets\SoundManager.cs" />
      <Compile Include="Assets\_RBIC\Scripts\02_Map_Selection\CharacterAvarToSelect.cs" />
      <Compile Include="Assets\_RBIC\Scripts\02_Map_Selection\CharacterScroller.cs" />
      <Compile Include="Assets\_RBIC\Scripts\02_Map_Selection\GizmosDraw.cs" />

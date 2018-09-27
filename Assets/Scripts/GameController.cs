@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour {
 
 	// Use this for initialization
+	private bool missSoundPlaying = false;
 	private Dash dash;
 	private CameraManager camManager;
     private TargetBoard targetBoard;
@@ -20,6 +21,7 @@ public class GameController : MonoBehaviour {
 	[Tooltip("How long to wait until the next dashing turn")]
 	public float viewChangeDistance = 20f;
     public float targetDashDistance;
+
 
     /*Rules for game. Move to level manager later*/
     public int numberToDashRemaining = 2;
@@ -46,29 +48,32 @@ public class GameController : MonoBehaviour {
         float dashZPos = dash.transform.position.z;
 		float zPosToChangeView = targetBoard.transform.position.z - viewChangeDistance;
 
-		bool dashHitSomething = dash.GetIsDashed()&&dash.IsKinematic();
+		bool dashHitSomething = dash.GetIsDashed() && dash.IsKinematic();
 		//Change camera view if approach near the target 
 		//Or if dash hit something
 		if(dashZPos >= zPosToChangeView || dashHitSomething){
-			dash.DisableInput(); 
+			camManager.StopWindSound();
 			camManager.ChangeToTargetCamera();
 
 			if(targetBoard.GetTargetIsHit()){
 				AddScore(targetBoard.GetScore());
-
                 UpdateSlider();
-                //CheckLevelPassableAndUpdateHUD();
 				RenewTarget(); 
 			}
-            //print("ISDash not available");
+            
             //when dash reach the target-like distance, handle the result
 			if (dashZPos >= targetBoard.transform.position.z || dashHitSomething){
+				if(dashZPos >= targetBoard.transform.position.z && !missSoundPlaying){
+					//TODO play miss sound here
+					print("Play miss sound");
+					AudioSource.PlayClipAtPoint(dash.missHit, dash.transform.position, 1f);
+					missSoundPlaying = true;
+				}
+
                 PrepareForNextDash();
 
-               // CurrentDashResultHandle ();
             }
-		}   
-	
+		} 	
 	}
 
     private void UpdateSlider()
@@ -106,7 +111,8 @@ public class GameController : MonoBehaviour {
             print("refreshing");
             //Detach main camera from dash
 			Camera.main.transform.SetParent(null);
-			camManager.ResetCameraPosition();
+			camManager.ResetCameraPosition(); //TODO seem dedundants, consider to remove
+
 			dash.DestroyDashGameObject();
             SpawnNewDash();
             CheckLevelUpToReNewTarget();
@@ -137,17 +143,21 @@ public class GameController : MonoBehaviour {
     {
         RuleManager ruleMng = FindObjectOfType<RuleManager>();
         if (scoreSlider.GetCanRenewTarget())
-        {
+        { 
             print("now spawn new target");
             targetBoard.DestroyTarget();
             
             //FindObjectOfType<TargetSpawner>().SpawnNewTargetWithGivenLevel(scoreSlider.GetCurrentLevel());
 			TargetSpawner targetSpawner =FindObjectOfType<TargetSpawner>();
 			targetSpawner.SpawnNewTargetOnTrunkWithLevel(scoreSlider.GetCurrentLevel());
+			camManager.ExposeCameraToTarget();
+			camManager.ResetCameraReady();
+
             targetBoard = GameObject.FindObjectOfType<TargetBoard>();
-            Camera cam = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
+
+            /*Camera cam = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
             cam.enabled = false;
-            camManager.ChangeToMainCamera();
+            camManager.ChangeToMainCamera();*/
 
             scoreSlider.DisableRenewTarget();
 

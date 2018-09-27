@@ -21,7 +21,9 @@ public class ScoreSlider : MonoBehaviour {
     public Animator poppingScoreAnimator;
 	public float fillingEffectDuration = 1f;
 
-
+	public AudioClip newLevelClip;
+	public AudioClip scoreRaisingClip;
+	AudioSource audioSource;
 
     // Use this for initialization
     void Start () {
@@ -29,8 +31,14 @@ public class ScoreSlider : MonoBehaviour {
 
         gameController = FindObjectOfType<GameController>();
         ruleMng = FindObjectOfType<RuleManager>();
-     
+		audioSource =  GetComponent<AudioSource>();
         slider = GetComponent<Slider>();
+    }
+
+    private void PlayAudioClip(AudioClip clipToPlay){
+		audioSource.clip = clipToPlay;
+		audioSource.loop = false;
+        audioSource.Play();
     }
 
     void Update(){
@@ -45,8 +53,12 @@ public class ScoreSlider : MonoBehaviour {
 
 
             slider.value += Time.deltaTime * valueToPutInSlider;
+			audioSource.volume = valueToPutInSlider;
             if (slider.value >= 1f)
             {
+            	//Play separated sound of level up
+				Play2DClipAtPoint(newLevelClip);
+
                 canRenewTarget = true;
 
                 slider.value = 0f;
@@ -54,6 +66,7 @@ public class ScoreSlider : MonoBehaviour {
                 gameController.RewardDashOnLevelUp(currentLevel);
                 levelText.text = "Level " + (currentLevel + 1).ToString();
             }
+
 
             fillImage.color = new Color(fillImage.color.r,
                                         fillImage.color.g,
@@ -64,6 +77,7 @@ public class ScoreSlider : MonoBehaviour {
             {
                 fillingEffectDuration = 1;
                 bCanUpdate = false;
+				audioSource.Stop();
 
             }
         }
@@ -71,6 +85,7 @@ public class ScoreSlider : MonoBehaviour {
      
     public void UpdateSlider( int ScoreToUpdate) 
     { 
+		PlayAudioClip(scoreRaisingClip);
 		scoreObtained = ScoreToUpdate;
 		bCanUpdate = true;
     }
@@ -97,4 +112,29 @@ public class ScoreSlider : MonoBehaviour {
     {
         canRenewTarget = false;
     }
+
+	public void Play2DClipAtPoint(AudioClip clip)
+	{
+	    //  Create a temporary audio source object
+	    GameObject tempAudioSource = new GameObject("TempAudio");
+
+	    //  Add an audio source
+	    AudioSource audioSource = tempAudioSource.AddComponent<AudioSource>();
+
+	    //  Add the clip to the audio source
+	    audioSource.clip = clip;
+
+	    //  Set the volume
+	    audioSource.volume = 1f;
+
+	    //  Set properties so it's 2D sound
+	    audioSource.spatialBlend = 0.0f;
+
+	    //  Play the audio
+	    audioSource.Play();
+
+	    //  Set it to self destroy
+	    Destroy(tempAudioSource, clip.length);
+
+	}
 }

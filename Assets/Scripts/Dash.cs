@@ -11,7 +11,10 @@ public class Dash : MonoBehaviour {
 	private Rigidbody rigidBody;
 	private CameraManager camManager;
 	private Animator dashAnimator;
-	private bool bCanInput = true;
+	public AudioClip stabHit;
+	public AudioClip missHit;
+	public AudioClip winding;
+	public AudioClip launch;
 	// Use this for initialization
 	void Start () {
 		rigidBody = GetComponent<Rigidbody>();
@@ -21,11 +24,12 @@ public class Dash : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
-		if(bCanInput){
-			if(Input.GetKey(KeyCode.Space) &&  rigidBody.isKinematic==true){
+		bool camReady = camManager.GetCamReady();
+		
+		if(camReady){
+			if(Input.GetKey(KeyCode.Space) && rigidBody.isKinematic==true){
                 rigidBody.isKinematic = false;
-                //Launch();
+
                 dashAnimator.SetTrigger("launch");
             } 
 			//Navigate the directions
@@ -48,7 +52,10 @@ public class Dash : MonoBehaviour {
 
 	void OnCollisionEnter(Collision collision){
 		rigidBody.isKinematic = true;
+		AudioSource.PlayClipAtPoint(stabHit, transform.position, 1f);
 		camManager.TurnOffDashingEffect();
+
+
 	}
 
 
@@ -57,6 +64,7 @@ public class Dash : MonoBehaviour {
 	}
 
 	void Launch(){
+		camManager.PlayWindSound();
 		dashAnimator.enabled = false;
 		StartRotate();
 		//guard check
@@ -88,15 +96,15 @@ public class Dash : MonoBehaviour {
 		Destroy(this.gameObject);
 	}
 
-	public void DisableInput(){
-		bCanInput = false;
-	}
-
-	public void EnableInput(){
-		bCanInput = true;
-	}
-
 	public bool IsKinematic(){
 		return rigidBody.isKinematic;
+	}
+
+	private void PlayWindArrowSound(){
+		AudioSource.PlayClipAtPoint(winding, transform.position, 1f);
+	}
+
+	private void PlayLaunchSound(){
+		AudioSource.PlayClipAtPoint(launch, transform.position, 1f);
 	}
 }

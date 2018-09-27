@@ -15,27 +15,30 @@ public class TargetSpawner : MonoBehaviour {
        	Transform trunk = trunks.GetChild(level);
        	//Assume the spawn point will be the first child in hierachy of trunk
        	Transform spawnPoint = trunk.GetChild(0);
-
+		GameObject targetToSpawn;
 		switch (level)
         {
         	//Normal target board if is level 1,2 or 3
             case 1:
             case 2:
             case 3:
-				Instantiate(targetPrefs[0], spawnPoint.position, Quaternion.identity);
+				targetToSpawn = Instantiate(targetPrefs[0], spawnPoint.position, Quaternion.identity);
+				targetToSpawn.transform.parent = spawnPoint;
 				break;
 			//Heart-shaped target board if level 4, 5, 6, 7
 			case 4:
             case 5:
             case 6:
             case 7:
-				Instantiate(targetPrefs[1], spawnPoint.position, Quaternion.identity);
+				targetToSpawn = Instantiate(targetPrefs[1], spawnPoint.position, Quaternion.identity);
+				targetToSpawn.transform.parent = spawnPoint;
 				break;
 			//Star-shaped target board if level 8,9, 10
 			case 8:
             case 9:
             case 10:
-				Instantiate(targetPrefs[2], spawnPoint.position, Quaternion.identity);
+				targetToSpawn= Instantiate(targetPrefs[2], spawnPoint.position, Quaternion.identity);
+				targetToSpawn.transform.parent = spawnPoint;
 				break;
 		}
     }
