@@ -174,7 +174,7 @@ public class GameController : MonoBehaviour {
 
 	public int GetCurrentScore(){
 		return scoreOfThisLevel;
-	}
+	} 
 
 	public void RewardDashOnLevelUp(int level){
 		//increase dash stock based on level
