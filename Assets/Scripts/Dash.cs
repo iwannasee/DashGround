@@ -6,7 +6,7 @@ public class Dash : MonoBehaviour {
 
 	public float launchSpeed = 0.0f;
 	public float pushingForce = 1.0f; 
-
+	private bool bCanInput = true;
 	private  bool isDashed = false;
 	private Rigidbody rigidBody;
 	private CameraManager camManager;
@@ -24,9 +24,14 @@ public class Dash : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+		if(!GameController.GetIsGameStarting()){
+			return;
+		}
+
 		bool camReady = camManager.GetCamReady();
 		
-		if(camReady){
+		if(camReady && bCanInput){
 			if(Input.GetKey(KeyCode.Space) && rigidBody.isKinematic==true){
                 rigidBody.isKinematic = false;
 
@@ -94,6 +99,10 @@ public class Dash : MonoBehaviour {
 
 	public void DestroyDashGameObject(){
 		Destroy(this.gameObject);
+	}
+
+	public void DisableInput(){
+		bCanInput = false;
 	}
 
 	public bool IsKinematic(){

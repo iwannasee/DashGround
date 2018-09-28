@@ -6,6 +6,7 @@ public class CameraManager : MonoBehaviour {
     public GameObject dashEffectPref;
 	public float timeWaitToAttachView;
 	public float maxLockOnTargetTime;
+	public float rotationSpeedWhenStart;
 	private Camera mainCamera;
     private Camera targetCamera;
 
@@ -15,10 +16,15 @@ public class CameraManager : MonoBehaviour {
 	private Transform attachedFollowDashCamPosition;
 
 	private bool isDashed = false;
+
+	private bool bIsRotateFirstTime = false;
+
 	private Vector3 camStartPosition;
+	private Quaternion camStartRotation;
 
 	private bool cameraReady = false;
-	private float speed;
+	private float lockOnPosToStartLinePosSpeed;
+
 	private float lockOnTargetTime; 
 
 	// Use this for initialization
@@ -28,23 +34,39 @@ public class CameraManager : MonoBehaviour {
         ChangeToMainCamera();
 
 		camStartPosition = mainCamera.transform.position;
+		//camStartRotation = mainCamera.transform.rotation;
+		camStartRotation = mainCamera.transform.rotation;
 		if(!mainCamera){
 			Debug.Log("Cameras Not Properly set");
 		}
 		lockOnTargetTime = maxLockOnTargetTime;
-		ExposeCameraToTarget();
+		ExposeCameraToTarget(16f);
+
+		Vector3 newCamRot = new Vector3(-50f,0f,0f);
+		mainCamera.transform.rotation = Quaternion.Euler(newCamRot);
+
 	}
 
 	void Update(){
-
+		if(!GameController.GetIsGameStarting()){
+			return;
+		}
+		if(!bIsRotateFirstTime){
+			mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, camStartRotation, rotationSpeedWhenStart*Time.deltaTime);
+			rotationSpeedWhenStart += Time.deltaTime;
+			if( Mathf.Abs(mainCamera.transform.rotation.eulerAngles.x - camStartRotation.eulerAngles.x) <= 0.1f){
+				bIsRotateFirstTime = true;
+			}
+			return; // remove this return if want to merge rotate time with lock on time
+		} 
+		 
 		lockOnTargetTime -= Time.deltaTime;
 		if(lockOnTargetTime<=0){
 			if(!cameraReady){
-				speed += Time.deltaTime;
-				mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camStartPosition,speed*0.1f);
+				lockOnPosToStartLinePosSpeed += Time.deltaTime;
+				mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, camStartPosition,lockOnPosToStartLinePosSpeed*0.1f);
 				if(Mathf.Abs(mainCamera.transform.position.z - camStartPosition.z) <= thresholdToGetReady){
 					cameraReady = true;
-
 				}
 			}
 		}
@@ -122,7 +144,7 @@ public class CameraManager : MonoBehaviour {
 		mainCamera.transform.GetChild(0).gameObject.SetActive(false);
     }
 
-    public void ExposeCameraToTarget(){
+	public void ExposeCameraToTarget(float lockOnTargetDistance){
 		TargetBoard targetBoard = FindObjectOfType<TargetBoard>();
 		if(!targetBoard){
 			print("no target board found");
@@ -130,7 +152,7 @@ public class CameraManager : MonoBehaviour {
 		}
 
 		Transform targetTransform = targetBoard.transform.parent;
-		Vector3 positionToSet = new Vector3(targetTransform.position.x, targetTransform.position.y, targetTransform.position.z - 16f); //0.31f);
+		Vector3 positionToSet = new Vector3(targetTransform.position.x, targetTransform.position.y, targetTransform.position.z - lockOnTargetDistance); //16f); //0.31f);
 		mainCamera.transform.position = positionToSet;
     }
 
@@ -139,7 +161,7 @@ public class CameraManager : MonoBehaviour {
    }
 
    public void ResetCameraReady(){
-   	speed = 0;
+   		lockOnPosToStartLinePosSpeed = 0;
    		cameraReady = false;
    		lockOnTargetTime = maxLockOnTargetTime;
    }

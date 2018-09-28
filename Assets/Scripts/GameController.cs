@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
 
+	private static bool bGameStart = false;
 	// Use this for initialization
 	private bool missSoundPlaying = false;
 	private Dash dash;
@@ -12,9 +13,6 @@ public class GameController : MonoBehaviour {
     private TargetBoard targetBoard;
     private float waitTimeToRefressCounter;
     private ScoreSlider scoreSlider;
-    public GameObject dashObject;
-    public Text scoreText;
-    public Text dashesLeftText;
 
     [Tooltip("How long to wait until the next dashing turn")]
 	public float waitTimeToRefresh = 1f;
@@ -22,6 +20,10 @@ public class GameController : MonoBehaviour {
 	public float viewChangeDistance = 20f;
     public float targetDashDistance;
 
+	public GameObject dashObjectPref;
+    public Text scoreText;
+    public Text dashesLeftText;
+    public RectTransform startGamePanel;
 
     /*Rules for game. Move to level manager later*/
     public int numberToDashRemaining = 2;
@@ -29,7 +31,9 @@ public class GameController : MonoBehaviour {
 
 	void Start () {
 		scoreSlider = FindObjectOfType<ScoreSlider>();
-        dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString();
+		if(dashesLeftText){
+        	dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString();
+        } 
         waitTimeToRefressCounter = waitTimeToRefresh;
 		targetBoard = GameObject.FindObjectOfType<TargetBoard>();
 		dash = GameObject.FindObjectOfType<Dash>();
@@ -38,12 +42,16 @@ public class GameController : MonoBehaviour {
 	 
 	// Update is called once per frame
 	void Update () {
-		if(!dash){
-            return;}
-		if(!dash.GetIsDashed()){
-             return;}
+		if(Input.GetMouseButtonDown(0) && !bGameStart){
+			bGameStart = true;
+			startGamePanel.gameObject.SetActive(false);
+		}
 
-        //camManager.ReGetCameras();
+		if (!bGameStart){return;}
+
+		if(!dash){return;}
+
+		if(!dash.GetIsDashed()){return;}
 
         float dashZPos = dash.transform.position.z;
 		float zPosToChangeView = targetBoard.transform.position.z - viewChangeDistance;
@@ -52,6 +60,7 @@ public class GameController : MonoBehaviour {
 		//Change camera view if approach near the target 
 		//Or if dash hit something
 		if(dashZPos >= zPosToChangeView || dashHitSomething){
+			dash.DisableInput();
 			camManager.StopWindSound();
 			camManager.ChangeToTargetCamera();
 
@@ -126,9 +135,8 @@ public class GameController : MonoBehaviour {
 
 	private void SpawnNewDash(){
 		numberToDashRemaining--;
-		dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString(); 
-		GameObject dashGameObject = (GameObject) Instantiate(dashObject, this.transform.position, this.transform.rotation);
-        
+		dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString();
+		GameObject dashGameObject = (GameObject) Instantiate(dashObjectPref, this.transform.position, this.transform.rotation);
 	}
 
 	private void ReFindDashObject(){
@@ -150,7 +158,7 @@ public class GameController : MonoBehaviour {
             //FindObjectOfType<TargetSpawner>().SpawnNewTargetWithGivenLevel(scoreSlider.GetCurrentLevel());
 			TargetSpawner targetSpawner =FindObjectOfType<TargetSpawner>();
 			targetSpawner.SpawnNewTargetOnTrunkWithLevel(scoreSlider.GetCurrentLevel());
-			camManager.ExposeCameraToTarget();
+			camManager.ExposeCameraToTarget(16f);
 			camManager.ResetCameraReady();
 
             targetBoard = GameObject.FindObjectOfType<TargetBoard>();
@@ -190,5 +198,9 @@ public class GameController : MonoBehaviour {
 		} 
 
 		numberToDashRemaining += dashBonus;
+	}
+
+	public static bool GetIsGameStarting(){
+		return bGameStart;
 	}
 } 

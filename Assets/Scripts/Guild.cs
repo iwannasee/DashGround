@@ -15,7 +15,6 @@ public class Guild : MonoBehaviour {
 
 	public void ToggleGuide()
 	{
-		print("ssss");
 		if(guidePanel){
 			if(guidePanel.gameObject.activeInHierarchy){
 				guidePanel.gameObject.SetActive(false);
