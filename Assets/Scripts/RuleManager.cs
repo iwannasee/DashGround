@@ -17,15 +17,6 @@ public class RuleManager : MonoBehaviour {
 	};
 
 	private int currentLevel = 0; //TODO remove this to avoid ambiguality
-	public bool bIsRescueMode = false; // TODO Make private later
-	public bool bIsAimGameMode = true; // TODO Make private later
-
-	private GameController gameController;
-
-	// Use this for initialization
-	void Start () { 
-		gameController = FindObjectOfType<GameController>();
-	}
 
 	public bool CheckLevelPassableBaseOnScore(int score, int level){
  
@@ -52,7 +43,7 @@ public class RuleManager : MonoBehaviour {
         {
             return 99999;
         }
-        
     }
 
 }
+ 

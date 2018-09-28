@@ -23,6 +23,7 @@ public class GameController : MonoBehaviour {
 	public GameObject dashObjectPref;
     public Text scoreText;
     public Text dashesLeftText;
+	//public GameObject dashesLeftText;
     public RectTransform startGamePanel;
 
     /*Rules for game. Move to level manager later*/
@@ -30,10 +31,9 @@ public class GameController : MonoBehaviour {
 	public int scoreOfThisLevel = 0;
 
 	void Start () {
+		print (this.gameObject.name);
 		scoreSlider = FindObjectOfType<ScoreSlider>();
-		if(dashesLeftText){
-        	dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString();
-        } 
+        dashesLeftText.text = "x " + numberToDashRemaining.ToString();
         waitTimeToRefressCounter = waitTimeToRefresh;
 		targetBoard = GameObject.FindObjectOfType<TargetBoard>();
 		dash = GameObject.FindObjectOfType<Dash>();
@@ -135,8 +135,8 @@ public class GameController : MonoBehaviour {
 
 	private void SpawnNewDash(){
 		numberToDashRemaining--;
-		dashesLeftText.text = "Dashes left: " + numberToDashRemaining.ToString();
-		GameObject dashGameObject = (GameObject) Instantiate(dashObjectPref, this.transform.position, this.transform.rotation);
+		dashesLeftText.text = "x " + numberToDashRemaining.ToString();
+		Instantiate(dashObjectPref, this.transform.position, this.transform.rotation);
 	}
 
 	private void ReFindDashObject(){
@@ -149,26 +149,16 @@ public class GameController : MonoBehaviour {
 
     private void CheckLevelUpToReNewTarget()
     {
-        RuleManager ruleMng = FindObjectOfType<RuleManager>();
         if (scoreSlider.GetCanRenewTarget())
         { 
             print("now spawn new target");
             targetBoard.DestroyTarget();
-            
-            //FindObjectOfType<TargetSpawner>().SpawnNewTargetWithGivenLevel(scoreSlider.GetCurrentLevel());
 			TargetSpawner targetSpawner =FindObjectOfType<TargetSpawner>();
 			targetSpawner.SpawnNewTargetOnTrunkWithLevel(scoreSlider.GetCurrentLevel());
 			camManager.ExposeCameraToTarget(16f);
 			camManager.ResetCameraReady();
-
             targetBoard = GameObject.FindObjectOfType<TargetBoard>();
-
-            /*Camera cam = GameObject.FindGameObjectWithTag("Target Camera").GetComponent<Camera>();
-            cam.enabled = false;
-            camManager.ChangeToMainCamera();*/
-
             scoreSlider.DisableRenewTarget();
-
         }
     }
 

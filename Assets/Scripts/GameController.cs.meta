@@ -1,10 +1,15 @@
 fileFormatVersion: 2
 guid: bf1fb974544048440a5153e4d9fa2403
-timeCreated: 1536193822
+timeCreated: 1538119423
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - dashObjectPref: {fileID: 1150254724084336, guid: 61a9868bb7979f84cbafbd34489f77d6,
+      type: 2}
+  - scoreText: {instanceID: 0}
+  - dashesLeftText: {instanceID: 0}
+  - startGamePanel: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
