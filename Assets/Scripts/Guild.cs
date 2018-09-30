@@ -15,6 +15,10 @@ public class Guild : MonoBehaviour {
 
 	public void ToggleGuide()
 	{
+        if (GameController.GetIsGameOver())
+        {
+            return; 
+        }
 		if(guidePanel){
 			if(guidePanel.gameObject.activeInHierarchy){
 				guidePanel.gameObject.SetActive(false);

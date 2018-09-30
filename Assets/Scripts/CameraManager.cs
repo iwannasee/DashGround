@@ -9,13 +9,14 @@ public class CameraManager : MonoBehaviour {
 	public float rotationSpeedWhenStart;
 	private Camera mainCamera;
     private Camera targetCamera;
+    private GameController gamController;
 
 	[Tooltip("the distance which anounces the arrow is launched if reached")]
     public float thresholdToChangeCamView; 
 	public float thresholdToGetReady;
 	private Transform attachedFollowDashCamPosition;
 
-	private bool isDashed = false;
+	private bool bSmoothView = false;
 
 	private bool bIsRotateFirstTime = false;
 
@@ -29,6 +30,7 @@ public class CameraManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        gamController = GameObject.FindGameObjectWithTag("GameController").GetComponent<GameController>();
         ReGetCameras();
 
         ChangeToMainCamera();
@@ -48,7 +50,8 @@ public class CameraManager : MonoBehaviour {
 	}
 
 	void Update(){
-		if(!GameController.GetIsGameStarting()){
+		if(!StartPanel.GetGameStart())
+        {
 			return;
 		}
 		if(!bIsRotateFirstTime){
@@ -73,12 +76,15 @@ public class CameraManager : MonoBehaviour {
 
 
 		//Actual Smooth change view process
-		if(isDashed){
+		if(bSmoothView)
+        {
 			mainCamera.transform.localPosition = Vector3.Lerp(mainCamera.transform.localPosition, 
 															attachedFollowDashCamPosition.localPosition, 0.1f);
 			if(Mathf.Abs(mainCamera.transform.localPosition.z - attachedFollowDashCamPosition.localPosition.z)< thresholdToChangeCamView){
-				isDashed = false;
-			}
+                bSmoothView = false;
+               
+
+            }
 		}
 	}
 
@@ -107,7 +113,8 @@ public class CameraManager : MonoBehaviour {
 
 		TurnOnDashingEffect();
         //set key to run actual smooth view changing
-        isDashed = true;
+        bSmoothView = true;
+        gamController.ActivateButtons();
 	}
 
 	public void ResetCameraPosition(){
@@ -115,6 +122,7 @@ public class CameraManager : MonoBehaviour {
 	}
 
 	public void ChangeToTargetCamera(){
+        gamController.DeactivateButton();
 		FindToSetTargetCamera();
         mainCamera.transform.GetChild(0).gameObject.SetActive(false);
         mainCamera.enabled = false;

@@ -4,9 +4,7 @@ using UnityEngine;
 
 public class SoundManager : MonoBehaviour {
 
-
-
-	public static void Play2DClipAtPoint(AudioClip clipToPlay)
+    public static void Play2DClipAtPoint(AudioClip clipToPlay)
 	{
 	    //  Create a temporary audio source object
 		GameObject tempAudioSource = new GameObject(clipToPlay.name);

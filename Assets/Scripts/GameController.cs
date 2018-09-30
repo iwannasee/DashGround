@@ -4,10 +4,11 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class GameController : MonoBehaviour {
-
-	private static bool bGameStart = false;
+    
 	// Use this for initialization
 	private bool missSoundPlaying = false;
+    private bool buttonHolding = false;
+    private static bool isGameOver = false;
 	private Dash dash;
 	private CameraManager camManager;
     private TargetBoard targetBoard;
@@ -25,14 +26,16 @@ public class GameController : MonoBehaviour {
     public Text dashesLeftText;
 	//public GameObject dashesLeftText;
     public RectTransform startGamePanel;
-
+    public GameObject Buttons;
     /*Rules for game. Move to level manager later*/
     public int numberToDashRemaining = 2;
 	public int scoreOfThisLevel = 0;
 
 	void Start () {
-		print (this.gameObject.name);
-		scoreSlider = FindObjectOfType<ScoreSlider>();
+        isGameOver = false;
+        Buttons.SetActive(false);
+        UpdateScoreText();
+        scoreSlider = FindObjectOfType<ScoreSlider>();
         dashesLeftText.text = "x " + numberToDashRemaining.ToString();
         waitTimeToRefressCounter = waitTimeToRefresh;
 		targetBoard = GameObject.FindObjectOfType<TargetBoard>();
@@ -42,12 +45,12 @@ public class GameController : MonoBehaviour {
 	 
 	// Update is called once per frame
 	void Update () {
-		if(Input.GetMouseButtonDown(0) && !bGameStart){
-			bGameStart = true;
-			startGamePanel.gameObject.SetActive(false);
+		if(Input.GetMouseButtonDown(0) && !StartPanel.GetIsScrollingUp()){
+            startGamePanel.GetComponent<Animator>().SetTrigger("StartGame");
+            StartPanel.SetIsScrollingUp();
 		}
 
-		if (!bGameStart){return;}
+		if (!StartPanel.GetGameStart()) {return;}
 
 		if(!dash){return;}
 
@@ -73,14 +76,10 @@ public class GameController : MonoBehaviour {
             //when dash reach the target-like distance, handle the result
 			if (dashZPos >= targetBoard.transform.position.z || dashHitSomething){
 				if(dashZPos >= targetBoard.transform.position.z && !missSoundPlaying){
-					//TODO play miss sound here
-					print("Play miss sound");
 					AudioSource.PlayClipAtPoint(dash.missHit, dash.transform.position, 1f);
 					missSoundPlaying = true;
 				}
-
                 PrepareForNextDash();
-
             }
 		} 	
 	}
@@ -88,7 +87,6 @@ public class GameController : MonoBehaviour {
     private void UpdateSlider()
     {
         ScoreSlider scoreSlider = FindObjectOfType<ScoreSlider>();
-       
         int scoreToPop = targetBoard.GetScore();
 		scoreSlider.UpdateSlider(scoreToPop);
         scoreSlider.PopTheScore(scoreToPop);
@@ -98,7 +96,7 @@ public class GameController : MonoBehaviour {
 	private void GameOver()
     {
         PauseMenuController pauseMenuController = FindObjectOfType<PauseMenuController>();
-        pauseMenuController.DisplayNotifText();
+        isGameOver = true;
         pauseMenuController.DisplayGameOverButtons();
 	}
 
@@ -115,15 +113,15 @@ public class GameController : MonoBehaviour {
                 GameOver();
                 return;
             }
-
 			camManager.ChangeToMainCamera();
-            print("refreshing");
             //Detach main camera from dash
 			Camera.main.transform.SetParent(null);
 			camManager.ResetCameraPosition(); //TODO seem dedundants, consider to remove
 
 			dash.DestroyDashGameObject();
             SpawnNewDash();
+            buttonHolding = false;
+
             CheckLevelUpToReNewTarget();
 
             ReFindDashObject();
@@ -151,7 +149,6 @@ public class GameController : MonoBehaviour {
     {
         if (scoreSlider.GetCanRenewTarget())
         { 
-            print("now spawn new target");
             targetBoard.DestroyTarget();
 			TargetSpawner targetSpawner =FindObjectOfType<TargetSpawner>();
 			targetSpawner.SpawnNewTargetOnTrunkWithLevel(scoreSlider.GetCurrentLevel());
@@ -190,7 +187,122 @@ public class GameController : MonoBehaviour {
 		numberToDashRemaining += dashBonus;
 	}
 
-	public static bool GetIsGameStarting(){
-		return bGameStart;
-	}
+    public void ActivateButtons()
+    {
+        Buttons.SetActive(true);
+        //dash.ButtonSetup();
+    }
+
+    public void DeactivateButton()
+    {
+        Buttons.SetActive(false);
+    }
+
+    public static bool GetIsGameOver()
+    {
+        return isGameOver;
+    }
+
+    /// <summary>
+    /// control dash button here
+    /// </summary>
+    public void OnPressRight()
+    {
+        buttonHolding = true;
+        StartCoroutine(PushForceDashRight());
+    }
+
+    public void OnPressLeft()
+    {
+        buttonHolding = true;
+        StartCoroutine(PushForceDashLeft());
+    }
+
+    public void OnPressUp()
+    {
+        buttonHolding = true;
+        StartCoroutine(PushForceDashUp());
+    }
+
+    public void OnPressDown()
+    {
+        buttonHolding = true;
+        StartCoroutine(PushForceDashDown());
+    }
+
+    public void OnReleaseRight()
+    {
+        buttonHolding = false;
+    }
+
+    public void OnReleaseLeft()
+    {
+        buttonHolding = false;
+    }
+
+    public void OnReleaseUp()
+    {
+        buttonHolding = false;
+    }
+
+    public void OnReleaseDown()
+    {
+        buttonHolding = false;
+    }
+
+    IEnumerator PushForceDashRight()
+    {
+        while (buttonHolding)
+        {
+            //OnHold.Invoke();
+            dash.PushForceDashRight();
+
+            // do any custom "OnHold" behavior here
+
+            yield return null; // makes the loop wait until next frame to continue
+        }
+        
+    }
+
+    IEnumerator PushForceDashLeft()
+    {
+        while (buttonHolding)
+        {
+            //OnHold.Invoke();
+            dash.PushForceDashLeft();
+
+            // do any custom "OnHold" behavior here
+
+            yield return null; // makes the loop wait until next frame to continue
+        }
+        
+    }
+
+    IEnumerator PushForceDashUp()
+    {
+        while (buttonHolding)
+        {
+            //OnHold.Invoke();
+            dash.PushForceDashUp();
+
+            // do any custom "OnHold" behavior here
+
+            yield return null; // makes the loop wait until next frame to continue
+        }
+        
+    }
+
+    IEnumerator PushForceDashDown()
+    {
+        while (buttonHolding)
+        {
+            //OnHold.Invoke();
+            dash.PushForceDashDown();
+
+            // do any custom "OnHold" behavior here
+
+            yield return null; // makes the loop wait until next frame to continue
+        }
+    }
+
 } 
